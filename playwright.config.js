@@ -34,7 +34,7 @@ export default defineConfig({
    //ver el broser que se abra a la hora de correr los test
   
   use: {
-    headless: false, 
+    headless: true, 
     // Base URL to use in actions like `await page.goto('/')`. 
     // baseURL: 'http://localhost:3000',
 
