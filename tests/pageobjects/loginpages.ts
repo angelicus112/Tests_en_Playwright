@@ -70,7 +70,7 @@ export class LoginPage {
     //mientras que este metotdo encapsula la logica de inicio de sesión
     //de forma unificada, facilitando el mantenimiento y la comprensión del código de prueba.
     //utilizando en una misma función los tres metodos anteriores
-    async loginWithCredentials(Username: string, Password: string, testInfo: TestInfo) {
+    async loginWithCredentials(Username: string, Password: string,  testInfo: TestInfo) {
  
         await this.fillUsername(Username);
         await this.fillPassword(Password);
