@@ -51,7 +51,7 @@ export default defineConfig({
     video: 'on',
     */
     //captura de pantalla y video si el test falla
-    screenshot: 'only-on-failure',fullPage:true,
+    screenshot: 'only-on-failure',
     video: 'on',
   },
   
