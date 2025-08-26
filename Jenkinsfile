@@ -3,7 +3,6 @@ pipeline {
     stages {
         stage('e2e-tests') {
             steps {
-                git url: 'https://github.com/angelicus112/Tests_en_Playwright.git', branch: 'main'
                 sh 'npm install'   // o "npm ci" si tenés package-lock.json
                 sh 'npx playwright test --reporter=html'
             }
