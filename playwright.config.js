@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import { permission } from 'process';
 //import path from 'path';
 
 require('dotenv').config(
@@ -58,18 +59,31 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+
+  {
+    name: "setup",
+    testMatch: /.*\.setup\.ts/, // Solo corre este
+  },
+  {
+    name: "chromium",
+    use: { 
+      ...devices["Desktop Chrome"],
+      contextOptions: {
+        permissions:["clipboard-read", "clipboard-write"],
+      },
+      storageState: "playwright/.auth/user.json", //usa el usuario ya creado con los mismos datos
+    },
+    //dependencies: ["setup"], // Corre setup primero creacon usuario nuevo cada vez que 
+    // este activo ahora lo saque porque ya cree uno pero aun asi se puede usar igual y sobre escribe la info
+  },
+    
     /*
     {
       name: 'Google Chrome',
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
      },
     */
-   
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
+    
 /*
     {
       name: 'firefox',
