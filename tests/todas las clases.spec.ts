@@ -205,7 +205,7 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
   Se encapsula la lógica de inicio de sesión en un solo lugar, facilitando el mantenimiento
   y la comprensión del código de prueba.*/
   // clase 6 import { LoginPage } from './pageobjects/loginpages';
-    test('integracion de funciones para simplificar', async ({ page }) => {
+    test('integracion de funciones para simplificar', async ({ page },testInfo) => {
   
       await page.goto('https://saucedemo.com')
   
@@ -220,7 +220,7 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
       // Utilizar el método loginWithCredentials para iniciar sesión
       // Esto mejora la reutilización del código y la legibilidad de las pruebas
       // Reemplazamos el código de la clase 4 por la clase LoginPage
-      await login.loginWithCredentials('standard_user', 'secret_sauce',test.info())
+      await login.loginWithCredentials('standard_user', 'secret_sauce',testInfo)
   
   
       const itemContainer = await page.locator('#inventory_container .inventory_item').all()
@@ -263,7 +263,7 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
       await login.clickLocator('a.shopping_cart_link');
   
       /*expect(page.getByRole('button', {name:'Checkout'})).toBeVisible()*/
-      await login.expectRol('button', 'Checkout',test.info())
+      await login.expectRol('button', 'Checkout',testInfo)
   
       console.log(`Articulo Dentro Del Carrito:\n`)
   
@@ -302,9 +302,9 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
   
       //verificar que estamos en la pagina de checkout overview
       /*expect(await page.locator('.title')).toBeVisible()*/
-        await login.expectLocator('.title',test.info())
+        await login.expectLocator('.title',testInfo)
       /*expect(await page.locator('.summary_total_label')).toBeVisible()*/
-        await login.expectLocator('.summary_total_label',test.info())
+        await login.expectLocator('.summary_total_label',testInfo)
   
       /*await page.getByRole('button',{name:"finish"}).click()*/
         await login.clickButton('finish');
@@ -312,7 +312,7 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
   
       //verificar que estamos en la pagina de checkout complete
       /*expect(page.getByRole('heading', {name:'Thank you for your order!'})).toBeVisible()*/
-        await login.expectRol('heading', 'Thank you for your order!',test.info())
+        await login.expectRol('heading', 'Thank you for your order!',testInfo)
       console.log(`Compra Realizada Con Exito\n`)
       console.log(`---------------------------------\n`)
       console.log(`Volviendo Al Inicio\n`) 
@@ -322,7 +322,7 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
   
       //verificar que estamos en la pagina de inicio
       /*expect(page.locator('.title')).toBeVisible()*/
-      await login.expectLocator('.title',test.info())
+      await login.expectLocator('.title',testInfo)
       console.log(`Estamos En La Pagina De Inicio\n`)
       console.log(`---------------------------------\n`)
   
@@ -335,10 +335,14 @@ test('simulacion de carrito de compras pag saudemo', async ({ page }) => {
 
 //clase 6 utilidad y funcion de variables de entorno
 
-test('TEST BASE', async ({ page }) => {
-
+test('TEST BASE', async ({ page },testInfo) => {
+  // Importar la clase LoginPage
+  const login = new LoginPage(page)
   await page.goto(process.env.URL) // salta error por predeterminado, pero funciona correctamente al ejecutar el test
+ await login.expectLocator('.login_logo', testInfo)
 
+    console.log(`Estamos En La Pagina De Inicio\n`)
+    console.log(`---------------------------------\n`)
 
     await page.pause()
 

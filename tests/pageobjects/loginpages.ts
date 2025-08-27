@@ -9,34 +9,26 @@
 // en la estructura de la página se reflejen en un solo lugar, en lugar de tener que actualizar múltiples 
 // pruebas individuales.
 
-import { expect, Locator, Page, TestInfo  } from "@playwright/test";
+// tests/pageobjects/loginpages.ts
+import { expect, Locator, Page, TestInfo } from "@playwright/test";
 import { exit } from "process";
-
-
-
+import { ScreenshotUtils } from '../utils/screenshot-utils'; // ← Importar el wrapper
 
 export class LoginPage {
-
-
-
-
-
-    
-   // Definición de selectores para los elementos de la página de inicio de sesión
-    // Estos selectores se utilizan para interactuar con los elementos de la página
     private readonly usernameTextbox: Locator;
     private readonly passwordTextbox: Locator;
     private readonly loginButton: Locator;
     private readonly page: Page;
+    private readonly screenshotUtils: ScreenshotUtils; // ← Instancia del wrapper
 
-    // Constructor que recibe una instancia de Page y asigna los selectores a las propiedades
-    // Esto permite que los selectores se utilicen en los métodos de la clase
     constructor(page: Page) {
         this.usernameTextbox = page.getByRole('textbox', { name: "Username" });
         this.passwordTextbox = page.getByRole('textbox', { name: "Password" });
         this.loginButton = page.getByRole('button', { name: "Login" });
-        this.page = page; 
+        this.page = page;
+        this.screenshotUtils = new ScreenshotUtils(page); // ← Inicializar wrapper
     }
+
 
     // Métodos para interactuar con los elementos de la página
     // Estos métodos encapsulan la lógica de interacción con los elementos, mejorando la reutilización
@@ -70,20 +62,13 @@ export class LoginPage {
     //mientras que este metotdo encapsula la logica de inicio de sesión
     //de forma unificada, facilitando el mantenimiento y la comprensión del código de prueba.
     //utilizando en una misma función los tres metodos anteriores
-    async loginWithCredentials(Username: string, Password: string,  testInfo: TestInfo) {
- 
+    async loginWithCredentials(Username: string, Password: string, testInfo: TestInfo) {
         await this.fillUsername(Username);
         await this.fillPassword(Password);
         await this.clickLoginButton();
-        await this.page.screenshot({path:'evidencia/login.png',fullPage:true})
-          // screenshot y attach al reporte
-            const screenshot = await this.page.screenshot({ fullPage: true });
-            await testInfo.attach('login', {
-                body: screenshot,
-                contentType: 'image/png',
-    });
-    
-
+        
+        // Usar el wrapper en lugar de extender Page ↓
+        await this.screenshotUtils.takeScreenshot(testInfo, 'login');
     }
 
     //los metodos para obtener numeros aleatorios no necesitan ser async
@@ -140,42 +125,34 @@ export class LoginPage {
 
     //este metodo verifica que el elemento especificado por el locator sea visible
     async expectLocator(locator, testInfo: TestInfo) {
-        // Verifica que el elemento especificado por el locator sea visible
-        expect(await this.page.locator(locator)).toBeVisible();
-        if (await this.page.locator(locator).isVisible()) {
+        const isVisible = await this.page.locator(locator).isVisible();
+        expect(isVisible).toBeTruthy();
+        
+        if (isVisible) {
             console.log(``);
-            const screenshot = await this.page.screenshot({ fullPage: true });
-            await testInfo.attach(`locator-${locator}`, {
-            body: screenshot,
-            contentType: 'image/png',
-            });
-        }else{
-          console.log(`El elemento con rol ${locator} no es visible.`);
-          console.log(`Asegúrate de que el elemento esté presente en la página antes de realizar la verificación.`);
-          console.log('Asegúrate de que el selector sea correcto y que el elemento esté cargado en la página antes de verificar su visibilidad.');
-          console.log(`---------------------------------\n`);
-          exit(1); // Termina el proceso si el elemento no es visible   
+            // Usar el wrapper ↓
+            await this.screenshotUtils.takeScreenshot(testInfo, `locator-${locator}`);
+        } else {
+            console.log(`El elemento con locator ${locator} no es visible.`);
+            console.log(`Asegúrate de que el elemento esté presente en la página.`);
+            console.log(`---------------------------------\n`);
+            exit(1);
         }
     }
 
-    // Este método verifica que un elemento con un rol y nombre específicos sea visible
-    async expectRol(rol,name: string,testInfo: TestInfo) {
-        expect(await this.page.getByRole(rol, { name })).toBeVisible();
-        if (await this.page.getByRole(rol, { name }).isVisible()) {
-            console.log(``);     
-            const screenshot = await this.page.screenshot({ fullPage: true });
-            await testInfo.attach(`locator-${rol}${name}`, {
-            body: screenshot,
-            contentType: 'image/png',
-            });
-        }else{
+    async expectRol(rol, name: string, testInfo: TestInfo) {
+        const isVisible = await this.page.getByRole(rol, { name }).isVisible();
+        expect(isVisible).toBeTruthy();
+        
+        if (isVisible) {
+            console.log(``);
+            // Usar el wrapper ↓
+            await this.screenshotUtils.takeScreenshot(testInfo, `rol-${rol}-${name}`);
+        } else {
             console.log(`El elemento con rol ${rol} y nombre ${name} no es visible.`);
-            console.log(`Asegúrate de que el elemento esté presente en la página antes de realizar la verificación.`);
-            console.log('Asegúrate de que el selector sea correcto y que el elemento esté cargado en la página antes de verificar su visibilidad.');
-            console.log(`---------------------------------\n`);        
-            exit(1); // Termina el proceso si el elemento no es visible   
-
+            console.log(`Asegúrate de que el elemento esté presente en la página.`);
+            console.log(`---------------------------------\n`);
+            exit(1);
         }
     }
-
 }
